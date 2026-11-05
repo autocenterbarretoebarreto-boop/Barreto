@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barreto & Barreto Auto Center</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            red: '#DC2626',
+                            redhover: '#B91C1C',
+                            dark: '#0F172A',
+                            navy: '#1E293B',
+                            gold: '#F59E0B',
+                            light: '#F8FAFC'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #F1F5F9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col justify-between">
+
+    <!-- Header / Navbar -->
+    <header class="bg-brand-dark text-white sticky top-0 z-40 shadow-md">
+        <!-- Top Banner / Wholesale Switcher -->
+        <div class="bg-brand-navy px-4 py-2 border-b border-gray-700 text-xs sm:text-sm">
+            <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+                <div class="flex items-center space-x-4 text-gray-300">
+                    <span><i class="fa-solid font-bold fa-phone text-brand-red mr-1"></i> (21) 92369-1944</span>
+                    <span class="hidden md:inline"><i class="fa-solid fa-envelope text-brand-red mr-1"></i> autocenterbarretoebarreto@gmail.com</span>
+                    <span class="hidden lg:inline text-gray-400">CNPJ: 16.100.492/0001-27</span>
+                </div>
+                <!-- Wholesale Mode Toggle -->
+                <div class="flex items-center space-x-2 bg-gray-900/80 px-3 py-1 rounded-full border border-gray-700">
+                    <span class="text-xs font-semibold text-gray-300">Modo de Compra:</span>
+                    <button id="btnVarejo" onclick="setMode('varejo')" class="px-2 py-0.5 rounded-full text-xs font-bold transition-all bg-brand-red text-white">Varejo</button>
+                    <button id="btnAtacado" onclick="setMode('atacado')" class="px-2 py-0.5 rounded-full text-xs font-bold transition-all text-gray-400 hover:text-white">Atacado (Caixa)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Header Navigation -->
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+            <!-- Logo -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('store')">
+                <div class="bg-brand-red p-2.5 rounded-xl shadow-lg flex items-center justify-center">
+                    <i class="fa-solid fa-car-side text-2xl text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-black tracking-wider uppercase text-white leading-none">
+                        Barreto <span class="text-brand-red">&</span> Barreto
+                    </h1>
+                    <p class="text-[10px] sm:text-xs text-gray-400 font-medium tracking-widest uppercase">Auto Center • Peças e Acessórios</p>
+                </div>
+            </div>
+
+            <!-- Search Bar (Desktop) -->
+            <div class="hidden md:flex flex-1 max-w-xl mx-4">
+                <div class="relative w-full">
+                    <input type="text" id="searchInput" onkeyup="filterProducts()" placeholder="Busque por peças, óleos (ex: 5w30), som, marcas, mecânica..." class="w-full bg-slate-800 text-white placeholder-gray-400 pl-4 pr-10 py-2.5 rounded-lg border border-slate-700 focus:outline-none focus:border-brand-red text-sm transition">
+                    <i class="fa-solid fa-magnifying-glass absolute right-3 top-3 text-gray-400"></i>
+                </div>
+            </div>
+
+            <!-- Actions Right -->
+            <div class="flex items-center space-x-3">
+                <!-- Seller Dashboard Switcher Button -->
+                <button onclick="switchTab('dashboard')" id="navDashboardBtn" class="flex items-center space-x-1 text-xs sm:text-sm bg-slate-800 hover:bg-slate-700 text-gray-200 px-3 py-2 rounded-lg transition border border-slate-700">
+                    <i class="fa-solid fa-user-shield text-brand-gold"></i>
+                    <span class="hidden sm:inline font-medium">Painel do Vendedor</span>
+                </button>
+
+                <!-- Store Switcher Button (When in dashboard) -->
+                <button onclick="switchTab('store')" id="navStoreBtn" class="hidden flex items-center space-x-1 text-xs sm:text-sm bg-slate-800 hover:bg-slate-700 text-gray-200 px-3 py-2 rounded-lg transition border border-slate-700">
+                    <i class="fa-solid fa-store text-brand-red"></i>
+                    <span class="hidden sm:inline font-medium">Ver Loja</span>
+                </button>
+
+                <!-- Cart Button -->
+                <button onclick="toggleCartModal()" class="relative bg-brand-red hover:bg-brand-redhover text-white p-2.5 rounded-lg transition shadow-md flex items-center space-x-2">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="hidden sm:inline text-xs font-bold uppercase tracking-wide">Carrinho</span>
+                    <span id="cartCountBadge" class="bg-white text-brand-red text-xs font-black w-5 h-5 rounded-full flex items-center justify-center">0</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Search Bar Mobile -->
+        <div class="px-4 pb-3 md:hidden">
+            <div class="relative w-full">
+                <input type="text" id="searchInputMobile" onkeyup="filterProductsMobile()" placeholder="Buscar peças, óleos, ferramentas..." class="w-full bg-slate-800 text-white placeholder-gray-400 pl-4 pr-10 py-2 rounded-lg border border-slate-700 focus:outline-none focus:border-brand-red text-sm">
+                <i class="fa-solid fa-magnifying-glass absolute right-3 top-2.5 text-gray-400"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6">
+
+        <!-- VIEW: CUSTOMER STORE VIEW -->
+        <div id="viewStore" class="space-y-6">
+
+            <!-- Wholesale Informative Alert -->
+            <div id="wholesaleNotice" class="hidden bg-amber-500/10 border border-amber-500/30 text-amber-900 rounded-xl p-4 flex items-start space-x-3 shadow-sm">
+                <i class="fa-solid fa-boxes-packing text-amber-600 text-2xl mt-0.5"></i>
+                <div>
+                    <h3 class="font-bold text-amber-800">Modo Atacado Ativado!</h3>
+                    <p class="text-xs sm:text-sm text-amber-700">Você está visualizando os preços de <strong>caixas fechadas</strong>. Os preços apresentados já calculam o valor unitário reduzido para compras em quantidade.</p>
+                </div>
+            </div>
+
+            <!-- Categories Slider / Buttons -->
+            <div class="flex items-center space-x-2 overflow-x-auto pb-2 custom-scrollbar">
+                <button onclick="filterCategory('todos')" class="cat-btn active bg-brand-dark text-white px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition shadow-sm border border-slate-700">Todas as Categorias</button>
+                <button onclick="filterCategory('Som Automotivo')" class="cat-btn bg-white hover:bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition shadow-sm border border-gray-200">Som & Acessórios</button>
+                <button onclick="filterCategory('Óleos e Lubrificantes')" class="cat-btn bg-white hover:bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition shadow-sm border border-gray-200">Óleos & Lubrificantes</button>
+                <button onclick="filterCategory('Filtros')" class="cat-btn bg-white hover:bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition shadow-sm border border-gray-200">Filtros Diversos</button>
+                <button onclick="filterCategory('Ferramentas & Mecânica')" class="cat-btn bg-white hover:bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition shadow-sm border border-gray-200">Ferramentas para Mecânicos</button>
+                <button onclick="filterCategory('Lataria & Iluminação')" class="cat-btn bg-white hover:bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition shadow-sm border border-gray-200">Faróis & Pára-choques</button>
+                <button onclick="filterCategory('Peças de Motor & Suspensão')" class="cat-btn bg-white hover:bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition shadow-sm border border-gray-200">Peças e Utilitários</button>
+            </div>
+
+            <!-- Filter Badges & Brand selector -->
+            <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-gray-200 shadow-sm text-xs">
+                <div class="flex items-center space-x-2">
+                    <span class="font-bold text-gray-500 uppercase tracking-wider">Filtrar por Marca:</span>
+                    <select id="brandSelect" onchange="filterProducts()" class="bg-gray-50 border border-gray-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-brand-red text-gray-700 font-medium">
+                        <option value="todas">Todas as Marcas</option>
+                        <option value="Castrol">Castrol</option>
+                        <option value="Mobil">Mobil</option>
+                        <option value="Havoline">Havoline</option>
+                        <option value="Pioneer">Pioneer</option>
+                        <option value="Taramps">Taramps</option>
+                        <option value="Bosch">Bosch</option>
+                        <option value="Tecfil">Tecfil</option>
+                        <option value="Tramontina Pro">Tramontina Pro</option>
+                        <option value="Bovenau">Bovenau</option>
+                        <option value="Arteb">Arteb</option>
+                        <option value="DTS">DTS</option>
+                    </select>
+                </div>
+                <div class="text-gray-500">
+                    Mostrando <span id="productCount" class="font-bold text-brand-dark">0</span> produtos
+                </div>
+            </div>
+
+            <!-- Product Cards Grid -->
+            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                <!-- Products dynamically rendered here -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="hidden text-center py-16 bg-white rounded-2xl border border-gray-200 shadow-sm">
+                <i class="fa-solid fa-box-open text-5xl text-gray-300 mb-3"></i>
+                <h3 class="text-lg font-bold text-gray-700">Nenhum produto encontrado</h3>
+                <p class="text-xs text-gray-500">Tente buscar por outros termos ou mudar os filtros de categoria.</p>
+            </div>
+        </div>
+
+        <!-- VIEW: SELLER DASHBOARD VIEW -->
+        <div id="viewDashboard" class="hidden space-y-6">
+
+            <div class="bg-brand-navy text-white p-6 rounded-2xl shadow-md border border-slate-700 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <span class="bg-brand-gold/20 text-brand-gold text-xs font-bold px-3 py-1 rounded-full border border-brand-gold/30 uppercase tracking-widest">Área Restrita do Vendedor</span>
+                    <h2 class="text-2xl font-bold mt-2">Painel de Vendas & Cobranças</h2>
+                    <p class="text-xs text-gray-400">Gerencie ordens de serviço, pedidos dos clientes e gere links rápidos de cobrança WhatsApp.</p>
+                </div>
+                <button onclick="openCustomChargeModal()" class="bg-brand-red hover:bg-brand-redhover text-white font-bold px-4 py-2.5 rounded-xl text-sm transition flex items-center space-x-2 shadow-lg">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                    <span>Gerar Nova Cobrança Direta</span>
+                </button>
+            </div>
+
+            <!-- Dashboard Stats Summary Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-receipt"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-semibold text-gray-400 uppercase">Vendas Realizadas</p>
+                        <h4 id="statTotalSales" class="text-2xl font-black text-gray-800">14</h4>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-dollar-sign"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-semibold text-gray-400 uppercase">Faturamento (Hoje)</p>
+                        <h4 id="statTotalRevenue" class="text-2xl font-black text-gray-800">R$ 4.850,00</h4>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-semibold text-gray-400 uppercase">Pedidos Pendentes</p>
+                        <h4 id="statPendingOrders" class="text-2xl font-black text-gray-800">3</h4>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-boxes-stacked"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-semibold text-gray-400 uppercase">Itens Vendidos</p>
+                        <h4 id="statTotalItems" class="text-2xl font-black text-gray-800">58 itens</h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders Table Section -->
+            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                <div class="p-5 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div>
+                        <h3 class="font-bold text-gray-800 text-lg">Histórico Recente de Pedidos</h3>
+                        <p class="text-xs text-gray-500">Acompanhamento dos orçamentos e compras iniciadas no site</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs text-gray-500 font-medium">Status:</span>
+                        <select id="dashStatusFilter" onchange="renderDashboardOrders()" class="text-xs bg-gray-50 border border-gray-300 rounded-lg px-3 py-1.5 focus:outline-none">
+                            <option value="todos">Todos os Status</option>
+                            <option value="Concluído">Concluído</option>
+                            <option value="Aguardando Pagamento">Aguardando Pagamento</option>
+                            <option value="Em Separação">Em Separação</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs sm:text-sm text-gray-600">
+                        <thead class="bg-gray-50 text-gray-700 uppercase font-semibold border-b border-gray-200 text-[11px]">
+                            <tr>
+                                <th class="px-4 py-3">Código / Data</th>
+                                <th class="px-4 py-3">Cliente</th>
+                                <th class="px-4 py-3">Modalidade</th>
+                                <th class="px-4 py-3">Itens</th>
+                                <th class="px-4 py-3">Valor Total</th>
+                                <th class="px-4 py-3">Status</th>
+                                <th class="px-4 py-3 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashOrdersTable" class="divide-y divide-gray-100">
+                            <!-- Dynamic Dashboard Orders -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-brand-dark text-gray-400 text-xs pt-10 pb-6 border-t border-slate-800 mt-12">
+        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-slate-800">
+            <!-- About -->
+            <div class="space-y-3">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-car-side text-brand-red text-xl"></i>
+                    <span class="text-lg font-black text-white tracking-wider">BARRETO & BARRETO</span>
+                </div>
+                <p class="leading-relaxed">Especialistas em peças de carros, utilitários, som automotivo, óleos, filtros e ferramentas para mecânicos. Atendimento em varejo e atacado com as melhores opções do mercado.</p>
+                <div class="text-gray-400 font-mono text-[11px]">CNPJ: 16.100.492/0001-27</div>
+            </div>
+
+            <!-- Categories Quick Link -->
+            <div>
+                <h4 class="text-white font-bold text-sm uppercase mb-3 border-b border-slate-800 pb-1">Linha de Produtos</h4>
+                <ul class="space-y-2">
+                    <li><a href="#" onclick="filterCategory('Som Automotivo'); switchTab('store');" class="hover:text-white transition">Rádios, Falantes, Molduras e Chicotes</a></li>
+                    <li><a href="#" onclick="filterCategory('Óleos e Lubrificantes'); switchTab('store');" class="hover:text-white transition">Óleos de Motor (5w30, 20w30, etc)</a></li>
+                    <li><a href="#" onclick="filterCategory('Filtros'); switchTab('store');" class="hover:text-white transition">Filtros de Óleo, Ar e Combustível</a></li>
+                    <li><a href="#" onclick="filterCategory('Ferramentas & Mecânica'); switchTab('store');" class="hover:text-white transition">Macacos Hidráulicos, Chaves e Caixas</a></li>
+                    <li><a href="#" onclick="filterCategory('Lataria & Iluminação'); switchTab('store');" class="hover:text-white transition">Faróis e Pára-choques Populares</a></li>
+                </ul>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="space-y-3">
+                <h4 class="text-white font-bold text-sm uppercase mb-3 border-b border-slate-800 pb-1">Atendimento ao Cliente</h4>
+                <div class="flex items-start space-x-3">
+                    <i class="fa-brands fa-whatsapp text-brand-red text-base mt-0.5"></i>
+                    <div>
+                        <p class="font-bold text-white">WhatsApp & Televendas</p>
+                        <p>(21) 92369-1944</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-3">
+                    <i class="fa-solid fa-envelope text-brand-red text-base mt-0.5"></i>
+                    <div>
+                        <p class="font-bold text-white">E-mail Comercial</p>
+                        <p>autocenterbarretoebarreto@gmail.com</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-3">
+                    <i class="fa-solid fa-box-open text-brand-red text-base mt-0.5"></i>
+                    <div>
+                        <p class="font-bold text-white">Vendas por Atacado</p>
+                        <p>Preços especiais para oficinas e revendedores.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 pt-6 flex flex-col sm:flex-row justify-between items-center text-gray-500 gap-2">
+            <p>&copy; 2026 Barreto & Barreto Auto Center - Todos os direitos reservados.</p>
+            <div class="flex space-x-4">
+                <span class="hover:text-gray-300 transition cursor-pointer">Termos de Atacado</span>
+                <span class="hover:text-gray-300 transition cursor-pointer">Garantia & Trocas</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- CART MODAL -->
+    <div id="cartModal" class="fixed inset-0 bg-black/60 z-50 hidden backdrop-blur-sm flex justify-end transition-opacity">
+        <div class="bg-white w-full max-w-md h-full flex flex-col shadow-2xl justify-between animate-in slide-in-from-right duration-300">
+            <!-- Header -->
+            <div class="bg-brand-dark text-white p-4 flex items-center justify-between border-b border-slate-700">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-cart-shopping text-brand-red"></i>
+                    <h3 class="font-bold text-lg">Meu Carrinho</h3>
+                    <span id="cartModeBadge" class="bg-slate-800 text-brand-gold text-[10px] uppercase font-bold px-2 py-0.5 rounded border border-slate-700">Varejo</span>
+                </div>
+                <button onclick="toggleCartModal()" class="text-gray-400 hover:text-white text-xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Cart Items Container -->
+            <div id="cartItemsContainer" class="flex-grow overflow-y-auto p-4 space-y-3 custom-scrollbar">
+                <!-- Cart items dynamically appended here -->
+            </div>
+
+            <!-- Footer / Total / Checkout Button -->
+            <div class="p-4 border-t border-gray-200 bg-gray-50 space-y-3">
+                <div class="space-y-1 text-xs text-gray-500">
+                    <div class="flex justify-between">
+                        <span>Subtotal:</span>
+                        <span id="cartSubtotal" class="font-bold text-gray-800">R$ 0,00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Modo selecionado:</span>
+                        <span id="cartModeText" class="font-semibold text-brand-red">Varejo (Peça avulsa)</span>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center pt-2 border-t border-gray-200">
+                    <span class="text-base font-extrabold text-gray-800">Total:</span>
+                    <span id="cartTotal" class="text-2xl font-black text-brand-red">R$ 0,00</span>
+                </div>
+
+                <!-- Customer Details Form for Checkout -->
+                <div class="space-y-2 pt-2 border-t border-gray-200">
+                    <input type="text" id="customerName" placeholder="Seu nome completo *" class="w-full text-xs p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-red">
+                    <input type="text" id="customerCity" placeholder="Bairro / Cidade para entrega *" class="w-full text-xs p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-red">
+                </div>
+
+                <button onclick="checkoutWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition shadow-lg flex items-center justify-center space-x-2">
+                    <i class="fa-brands fa-whatsapp text-xl"></i>
+                    <span>Enviar Pedido pelo WhatsApp</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SELLER: CREATE CUSTOM CHARGE MODAL -->
+    <div id="customChargeModal" class="fixed inset-0 bg-black/60 z-50 hidden backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-gray-200 space-y-4">
+            <div class="flex justify-between items-center border-b border-gray-100 pb-3">
+                <div class="flex items-center space-x-2 text-brand-dark">
+                    <i class="fa-solid fa-file-invoice-dollar text-brand-red text-xl"></i>
+                    <h3 class="font-bold text-lg">Gerar Cobrança Personalizada</h3>
+                </div>
+                <button onclick="closeCustomChargeModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form id="chargeForm" onsubmit="handleGenerateCharge(event)" class="space-y-3 text-xs sm:text-sm">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-1">Nome do Cliente / Oficina</label>
+                    <input type="text" id="chargeClientName" required placeholder="Ex: Oficina Auto Freios Rápido" class="w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-red">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-1">Telefone / WhatsApp</label>
+                    <input type="text" id="chargeClientPhone" required placeholder="Ex: 21999999999" class="w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-red">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-1">Valor da Cobrança (R$)</label>
+                        <input type="number" step="0.01" id="chargeAmount" required placeholder="0.00" class="w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-red font-bold text-gray-800">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-1">Forma de Pagamento</label>
+                        <select id="chargePaymentType" class="w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-red">
+                            <option value="Pix à Vista">Pix à Vista (Desconto)</option>
+                            <option value="Cartão de Crédito">Cartão de Crédito</option>
+                            <option value="Boleto Faturado (Atacado)">Boleto Faturado (Atacado)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-1">Descrição dos Itens / Serviços</label>
+                    <textarea id="chargeDescription" rows="3" required placeholder="Ex: 5x Caixas Óleo 5w30 Castrol + 10 Filtros Tecfil PSL55 + 1 Macaco 2T Bovenau" class="w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-red"></textarea>
+                </div>
+
+                <div class="pt-2 flex justify-end space-x-2">
+                    <button type="button" onclick="closeCustomChargeModal()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition font-medium">Cancelar</button>
+                    <button type="submit" class="px-5 py-2 bg-brand-red hover:bg-brand-redhover text-white font-bold rounded-lg transition shadow">Gerar Cobrança WhatsApp</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Database of Products - Extensive Catalog with Various Brands and Wholesale/Retail pricing
+        const productsDatabase = [
+            // --- Óleos e Lubrificantes ---
+            {
+                id: 1,
+                name: "Óleo de Motor Castrol Magnatec 5W30 Sintético 1L",
+                category: "Óleos e Lubrificantes",
+                brand: "Castrol",
+                retailPrice: 58.90,
+                wholesalePrice: 46.50,
+                wholesaleMinQty: 12, // Caixa com 12L
+                badge: "Mais Vendido",
+                icon: "fa-oil-can",
+                desc: "Proteção contínua desde a partida. Indicado para motores modernos a gasolina, etanol e flex."
+            },
+            {
+                id: 2,
+                name: "Óleo de Motor Mobil Super 20W50 Mineral 1L",
+                category: "Óleos e Lubrificantes",
+                brand: "Mobil",
+                retailPrice: 38.00,
+                wholesalePrice: 29.90,
+                wholesaleMinQty: 12,
+                badge: "Linha Pesada/Leve",
+                icon: "fa-oil-can",
+                desc: "Alta viscosidade e proteção contra desgaste em motores com alta quilometragem."
+            },
+            {
+                id: 3,
+                name: "Óleo de Motor Havoline 10W40 Semissintético 1L",
+                category: "Óleos e Lubrificantes",
+                brand: "Havoline",
+                retailPrice: 44.90,
+                wholesalePrice: 34.00,
+                wholesaleMinQty: 12,
+                badge: "Especial Flex",
+                icon: "fa-oil-can",
+                desc: "Tecnologia Shield Protect que prolonga a vida útil do motor e reduz emissões."
+            },
+
+            // --- Filtros ---
+            {
+                id: 4,
+                name: "Filtro de Óleo Tecfil PSL55 (Linha VW / GM)",
+                category: "Filtros",
+                brand: "Tecfil",
+                retailPrice: 28.00,
+                wholesalePrice: 17.50,
+                wholesaleMinQty: 24, // Caixa com 24 un
+                badge: "Original",
+                icon: "fa-filter",
+                desc: "Retenção máxima de impurezas, garantindo a perfeita lubrificação do motor."
+            },
+            {
+                id: 5,
+                name: "Filtro de Ar de Motor Bosch Carro Popular (Gol/Fox/Uno)",
+                category: "Filtros",
+                brand: "Bosch",
+                retailPrice: 35.00,
+                wholesalePrice: 22.00,
+                wholesaleMinQty: 15,
+                badge: "Alta Eficiência",
+                icon: "fa-wind",
+                desc: "Elemento filtrante de alta capacidade que protege a admissão do motor."
+            },
+            {
+                id: 6,
+                name: "Kit Filtros (Ar + Óleo + Combustível + Cabine) Tecfil",
+                category: "Filtros",
+                brand: "Tecfil",
+                retailPrice: 110.00,
+                wholesalePrice: 79.90,
+                wholesaleMinQty: 5,
+                badge: "Kit Revisão",
+                icon: "fa-cubes",
+                desc: "Jogo completo de filtros para revisão de 10.000km de veículos leves."
+            },
+
+            // --- Som Automotivo & Acessórios ---
+            {
+                id: 7,
+                name: "Radio Som Automotivo Pioneer Bluetooth + USB / MP3 MVH-S218BT",
+                category: "Som Automotivo",
+                brand: "Pioneer",
+                retailPrice: 389.00,
+                wholesalePrice: 310.00,
+                wholesaleMinQty: 4,
+                badge: "Lançamento",
+                icon: "fa-radio",
+                desc: "Atenda chamadas viva-voz, streaming de áudio e entrada USB frontal."
+            },
+            {
+                id: 8,
+                name: "Par de Auto Falantes 6x9 Polegadas Taramps 200W RMS",
+                category: "Som Automotivo",
+                brand: "Taramps",
+                retailPrice: 219.00,
+                wholesalePrice: 165.00,
+                wholesaleMinQty: 6,
+                badge: "Potência Total",
+                icon: "fa-compact-disc",
+                desc: "Alta qualidade sonora e graves marcantes para o tampão do veículo."
+            },
+            {
+                id: 9,
+                name: "Moldura de Painel 2 DIN Universal com Adaptador Chicote",
+                category: "Som Automotivo",
+                brand: "DTS",
+                retailPrice: 65.00,
+                wholesalePrice: 42.00,
+                wholesaleMinQty: 10,
+                badge: "Universal",
+                icon: "fa-sliders",
+                desc: "Encaixe perfeito para instalação de centrais multimídia e aparelhos 2 DIN."
+            },
+
+            // --- Ferramentas & Mecânica ---
+            {
+                id: 10,
+                name: "Macaco Hidráulico Garrafa 2 Toneladas Bovenau",
+                category: "Ferramentas & Mecânica",
+                brand: "Bovenau",
+                retailPrice: 179.00,
+                wholesalePrice: 129.00,
+                wholesaleMinQty: 4,
+                badge: "Uso Profissional",
+                icon: "fa-truck-pickup",
+                desc: "Construção robusta para suporte de carga pesada e manutenção mecânica."
+            },
+            {
+                id: 11,
+                name: "Jogo de Chaves Soquete Rasteira 46 Peças Aço Cromo Vanádio",
+                category: "Ferramentas & Mecânica",
+                brand: "Tramontina Pro",
+                retailPrice: 198.00,
+                wholesalePrice: 145.00,
+                wholesaleMinQty: 5,
+                badge: "Maleta Completa",
+                icon: "fa-wrench",
+                desc: "Maleta organizadora reforçada com catraca reversível e bits variados."
+            },
+            {
+                id: 12,
+                name: "Caixa Organizadora de Ferramentas Plástica 20\" Profissional",
+                category: "Ferramentas & Mecânica",
+                brand: "Tramontina Pro",
+                retailPrice: 115.00,
+                wholesalePrice: 82.00,
+                wholesaleMinQty: 6,
+                badge: "Oficina",
+                icon: "fa-toolbox",
+                desc: "Bandeja removível e fechos metálicos com trava para segurança dos equipamentos."
+            },
+
+            // --- Lataria & Iluminação ---
+            {
+                id: 13,
+                name: "Farol Dianteiro Máscara Negra Arteb (Gol G5 / Voyage)",
+                category: "Lataria & Iluminação",
+                brand: "Arteb",
+                retailPrice: 249.00,
+                wholesalePrice: 189.00,
+                wholesaleMinQty: 4,
+                badge: "Linha de Montagem",
+                icon: "fa-lightbulb",
+                desc: "Foco duplo com acabamento esportivo máscara negra de altíssima durabilidade."
+            },
+            {
+                id: 14,
+                name: "Pára-choque Dianteiro Liso para Pintura (Palio / Siena Fire)",
+                category: "Lataria & Iluminação",
+                brand: "DTS",
+                retailPrice: 280.00,
+                wholesalePrice: 210.00,
+                wholesaleMinQty: 3,
+                badge: "Funilaria",
+                icon: "fa-car-burst",
+                desc: "Plástico de alta resistência com alinhamento original para substituição rápida."
+            },
+
+            // --- Peças & Utilitários ---
+            {
+                id: 15,
+                name: "Kit Amortecedores Dianteiros Monroe (Celta / Corsa Classic)",
+                category: "Peças de Motor & Suspensão",
+                brand: "Bosch",
+                retailPrice: 590.00,
+                wholesalePrice: 460.00,
+                wholesaleMinQty: 2,
+                badge: "Garantia 2 Anos",
+                icon: "fa-gears",
+                desc: "Maior estabilidade e conforto para a suspensão dianteira de carros populares."
+            }
+        ];
+
+        // State Management
+        let cart = [];
+        let currentMode = 'varejo'; // 'varejo' or 'atacado'
+        let currentCategory = 'todos';
+
+        // Mock Orders for Dashboard
+        let mockOrders = [
+            {
+                id: "ORD-9821",
+                date: "05/11/2026",
+                client: "Auto Mecânica do Baixinho",
+                mode: "Atacado",
+                itemsSummary: "12x Óleo Castrol 5w30 + 24x Filtro Tecfil",
+                total: "R$ 978,00",
+                status: "Aguardando Pagamento"
+            },
+            {
+                id: "ORD-9820",
+                date: "05/11/2026",
+                client: "Carlos Eduardo Santos",
+                mode: "Varejo",
+                itemsSummary: "1x Radio Pioneer + 1x Par Falantes Taramps",
+                total: "R$ 608,00",
+                status: "Concluído"
+            },
+            {
+                id: "ORD-9819",
+                date: "04/11/2026",
+                client: "Oficina e Centro Automotivo Silva",
+                mode: "Atacado",
+                itemsSummary: "5x Kit Ferramentas + 4x Macaco Bovenau",
+                total: "R$ 1.241,00",
+                status: "Em Separação"
+            }
+        ];
+
+        // Init App
+        window.onload = function() {
+            renderProducts();
+            renderDashboardOrders();
+        };
+
+        // Navigation Switcher
+        function switchTab(tab) {
+            const storeView = document.getElementById('viewStore');
+            const dashView = document.getElementById('viewDashboard');
+            const navDashBtn = document.getElementById('navDashboardBtn');
+            const navStoreBtn = document.getElementById('navStoreBtn');
+
+            if (tab === 'dashboard') {
+                storeView.classList.add('hidden');
+                dashView.classList.remove('hidden');
+                navDashBtn.classList.add('hidden');
+                navStoreBtn.classList.remove('hidden');
+            } else {
+                dashView.classList.add('hidden');
+                storeView.classList.remove('hidden');
+                navStoreBtn.classList.add('hidden');
+                navDashboardBtn.classList.remove('hidden');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Mode Switcher (Varejo / Atacado)
+        function setMode(mode) {
+            currentMode = mode;
+            const btnVarejo = document.getElementById('btnVarejo');
+            const btnAtacado = document.getElementById('btnAtacado');
+            const wholesaleNotice = document.getElementById('wholesaleNotice');
+            const cartModeBadge = document.getElementById('cartModeBadge');
+            const cartModeText = document.getElementById('cartModeText');
+
+            if (mode === 'atacado') {
+                btnAtacado.className = "px-2.5 py-1 rounded-full text-xs font-bold transition-all bg-brand-gold text-slate-900 shadow";
+                btnVarejo.className = "px-2.5 py-1 rounded-full text-xs font-bold transition-all text-gray-400 hover:text-white";
+                wholesaleNotice.classList.remove('hidden');
+                cartModeBadge.textContent = "Atacado";
+                cartModeBadge.className = "bg-brand-gold text-slate-900 text-[10px] uppercase font-extrabold px-2 py-0.5 rounded";
+                cartModeText.textContent = "Atacado (Preço por Caixa / Atacado)";
+            } else {
+                btnVarejo.className = "px-2.5 py-1 rounded-full text-xs font-bold transition-all bg-brand-red text-white shadow";
+                btnAtacado.className = "px-2.5 py-1 rounded-full text-xs font-bold transition-all text-gray-400 hover:text-white";
+                wholesaleNotice.classList.add('hidden');
+                cartModeBadge.textContent = "Varejo";
+                cartModeBadge.className = "bg-slate-800 text-brand-gold text-[10px] uppercase font-bold px-2 py-0.5 rounded border border-slate-700";
+                cartModeText.textContent = "Varejo (Unidade avulsa)";
+            }
+
+            renderProducts();
+            updateCartUI();
+        }
+
+        // Filter Category
+        function filterCategory(cat) {
+            currentCategory = cat;
+            
+            // update UI buttons
+            const buttons = document.querySelectorAll('.cat-btn');
+            buttons.forEach(btn => {
+                if (btn.textContent.includes(cat) || (cat === 'todos' && btn.textContent.includes('Todas'))) {
+                    btn.className = "cat-btn active bg-brand-dark text-white px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition shadow-sm border border-slate-700";
+                } else {
+                    btn.className = "cat-btn bg-white hover:bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition shadow-sm border border-gray-200";
+                }
+            });
+
+            filterProducts();
+        }
+
+        // Filter Products combined
+        function filterProducts() {
+            const query = (document.getElementById('searchInput').value || document.getElementById('searchInputMobile').value || '').toLowerCase();
+            const brandFilter = document.getElementById('brandSelect').value;
+
+            const filtered = productsDatabase.filter(prod => {
+                const matchCategory = currentCategory === 'todos' || prod.category === currentCategory;
+                const matchBrand = brandFilter === 'todas' || prod.brand === brandFilter;
+                const matchQuery = prod.name.toLowerCase().includes(query) || 
+                                   prod.desc.toLowerCase().includes(query) || 
+                                   prod.brand.toLowerCase().includes(query) ||
+                                   prod.category.toLowerCase().includes(query);
+
+                return matchCategory && matchBrand && matchQuery;
+            });
+
+            renderProductGrid(filtered);
+        }
+
+        function filterProductsMobile() {
+            filterProducts();
+        }
+
+        // Render Product Cards Grid
+        function renderProducts() {
+            filterProducts();
+        }
+
+        function renderProductGrid(products) {
+            const grid = document.getElementById('productGrid');
+            const emptyState = document.getElementById('emptyState');
+            const productCount = document.getElementById('productCount');
+
+            productCount.textContent = products.length;
+
+            if (products.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            grid.innerHTML = products.map(prod => {
+                const priceToShow = currentMode === 'atacado' ? prod.wholesalePrice : prod.retailPrice;
+                const isWholesale = currentMode === 'atacado';
+
+                return `
+                    <div class="bg-white rounded-2xl border border-gray-200 hover:border-brand-red/40 hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden group">
+                        <!-- Top Icon Banner placeholder -->
+                        <div class="p-6 bg-slate-900/5 group-hover:bg-slate-900/10 transition flex flex-col items-center justify-center relative min-h-[140px]">
+                            <span class="absolute top-3 left-3 bg-slate-900 text-white text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">
+                                ${prod.brand}
+                            </span>
+                            ${prod.badge ? `
+                                <span class="absolute top-3 right-3 bg-brand-red/10 text-brand-red border border-brand-red/30 text-[10px] font-bold px-2 py-0.5 rounded-md">
+                                    ${prod.badge}
+                                </span>
+                            ` : ''}
+                            <i class="fa-solid ${prod.icon} text-5xl text-slate-700 group-hover:scale-110 transition duration-300"></i>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="p-4 flex-grow flex flex-col justify-between space-y-3">
+                            <div>
+                                <span class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">${prod.category}</span>
+                                <h3 class="font-bold text-gray-800 text-sm leading-snug line-clamp-2 mt-0.5 group-hover:text-brand-red transition">${prod.name}</h3>
+                                <p class="text-xs text-gray-500 mt-1 line-clamp-2">${prod.desc}</p>
+                            </div>
+
+                            <div class="pt-2 border-t border-gray-100">
+                                <div class="flex items-baseline justify-between">
+                                    <div>
+                                        <span class="text-[10px] font-bold ${isWholesale ? 'text-brand-gold' : 'text-gray-400'} uppercase block">
+                                            ${isWholesale ? `Atacado (Mín: ${prod.wholesaleMinQty} un)` : 'Preço Varejo'}
+                                        </span>
+                                        <span class="text-xl font-black text-gray-900">
+                                            R$ ${priceToShow.toFixed(2).replace('.', ',')}
+                                        </span>
+                                        <span class="text-[10px] text-gray-400 font-medium">/ un</span>
+                                    </div>
+                                    ${isWholesale ? `
+                                        <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                                            Economize R$ ${(prod.retailPrice - prod.wholesalePrice).toFixed(2).replace('.', ',')}
+                                        </span>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer Action -->
+                        <div class="px-4 pb-4">
+                            <button onclick="addToCart(${prod.id})" class="w-full bg-brand-dark hover:bg-brand-red text-white text-xs font-bold py-2.5 rounded-xl transition duration-200 flex items-center justify-center space-x-2 shadow-sm">
+                                <i class="fa-solid fa-cart-plus"></i>
+                                <span>Adicionar ao Carrinho</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Cart Functionalities
+        function addToCart(prodId) {
+            const product = productsDatabase.find(p => p.id === prodId);
+            if (!product) return;
+
+            const existingIndex = cart.findIndex(item => item.id === prodId && item.mode === currentMode);
+
+            const minQty = currentMode === 'atacado' ? product.wholesaleMinQty : 1;
+            const unitPrice = currentMode === 'atacado' ? product.wholesalePrice : product.retailPrice;
+
+            if (existingIndex > -1) {
+                cart[existingIndex].qty += (currentMode === 'atacado' ? product.wholesaleMinQty : 1);
+            } else {
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    brand: product.brand,
+                    mode: currentMode,
+                    price: unitPrice,
+                    qty: minQty,
+                    minQty: minQty
+                });
+            }
+
+            updateCartUI();
+            toggleCartModal(true); // Open cart modal when adding
+        }
+
+        function updateCartQty(index, change) {
+            if (cart[index]) {
+                const item = cart[index];
+                const step = item.mode === 'atacado' ? item.minQty : 1;
+                item.qty += (change * step);
+
+                if (item.qty <= 0) {
+                    cart.splice(index, 1);
+                }
+            }
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cartItemsContainer');
+            const cartCountBadge = document.getElementById('cartCountBadge');
+            const cartSubtotal = document.getElementById('cartSubtotal');
+            const cartTotal = document.getElementById('cartTotal');
+
+            const totalItemsCount = cart.reduce((acc, curr) => acc + curr.qty, 0);
+            cartCountBadge.textContent = totalItemsCount;
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-gray-400">
+                        <i class="fa-solid fa-basket-shopping text-4xl mb-2 text-gray-300"></i>
+                        <p class="text-xs font-medium">Seu carrinho está vazio.</p>
+                        <button onclick="toggleCartModal()" class="mt-3 text-xs font-bold text-brand-red hover:underline">Navegar pelos produtos</button>
+                    </div>
+                `;
+                cartSubtotal.textContent = "R$ 0,00";
+                cartTotal.textContent = "R$ 0,00";
+                return;
+            }
+
+            let grandTotal = 0;
+
+            container.innerHTML = cart.map((item, idx) => {
+                const itemTotal = item.price * item.qty;
+                grandTotal += itemTotal;
+
+                return `
+                    <div class="bg-gray-50 border border-gray-200 p-3 rounded-xl flex items-center justify-between gap-3">
+                        <div class="flex-grow">
+                            <span class="text-[9px] font-bold bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded uppercase">${item.brand} • ${item.mode}</span>
+                            <h4 class="font-bold text-gray-800 text-xs mt-1 leading-snug">${item.name}</h4>
+                            <div class="text-xs text-gray-500 font-semibold mt-0.5">
+                                R$ ${item.price.toFixed(2).replace('.', ',')} <span class="text-[10px] font-normal">/ un</span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col items-end space-y-1">
+                            <div class="flex items-center space-x-1.5 bg-white border border-gray-300 rounded-lg p-1">
+                                <button onclick="updateCartQty(${idx}, -1)" class="w-5 h-5 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded text-xs font-bold">-</button>
+                                <span class="text-xs font-bold w-6 text-center text-gray-800">${item.qty}</span>
+                                <button onclick="updateCartQty(${idx}, 1)" class="w-5 h-5 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded text-xs font-bold">+</button>
+                            </div>
+                            <span class="text-xs font-black text-brand-dark">
+                                R$ ${itemTotal.toFixed(2).replace('.', ',')}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            cartSubtotal.textContent = `R$ ${grandTotal.toFixed(2).replace('.', ',')}`;
+            cartTotal.textContent = `R$ ${grandTotal.toFixed(2).replace('.', ',')}`;
+        }
+
+        function toggleCartModal(forceOpen = false) {
+            const modal = document.getElementById('cartModal');
+            if (forceOpen) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.toggle('hidden');
+            }
+        }
+
+        // WhatsApp Checkout
+        function checkoutWhatsApp() {
+            if (cart.length === 0) {
+                alert("Seu carrinho está vazio!");
+                return;
+            }
+
+            const name = document.getElementById('customerName').value.trim();
+            const city = document.getElementById('customerCity').value.trim();
+
+            if (!name || !city) {
+                alert("Por favor, informe seu nome e bairro/cidade antes de finalizar o pedido.");
+                return;
+            }
+
+            let message = `*NOVO PEDIDO DE COMPRA - BARRETO & BARRETO AUTO CENTER*\n`;
+            message += `--------------------------------------------------\n`;
+            message += `*Cliente:* ${name}\n`;
+            message += `*Local de Entrega:* ${city}\n`;
+            message += `*Modalidade:* ${currentMode.toUpperCase()}\n`;
+            message += `--------------------------------------------------\n\n`;
+            message += `*ITENS DO PEDIDO:*\n`;
+
+            let total = 0;
+            cart.forEach((item, index) => {
+                const sub = item.price * item.qty;
+                total += sub;
+                message += `${index + 1}. *${item.name}*\n   - Qtd: ${item.qty} un (${item.mode})\n   - Valor Unit: R$ ${item.price.toFixed(2).replace('.', ',')}\n   - Subtotal: R$ ${sub.toFixed(2).replace('.', ',')}\n\n`;
+            });
+
+            message += `--------------------------------------------------\n`;
+            message += `*VALOR TOTAL DO PEDIDO: R$ ${total.toFixed(2).replace('.', ',')}*\n`;
+            message += `--------------------------------------------------\n`;
+            message += `Aguardo confirmação de estoque e chave Pix/instruções para pagamento.`;
+
+            const phone = "5521923691944";
+            const encodedText = encodeURIComponent(message);
+            window.open(`https://wa.me/${phone}?text=${encodedText}`, '_blank');
+
+            // Save Mock Order to Seller Dashboard
+            mockOrders.unshift({
+                id: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
+                date: new Date().toLocaleDateString('pt-BR'),
+                client: name,
+                mode: currentMode === 'atacado' ? 'Atacado' : 'Varejo',
+                itemsSummary: cart.map(i => `${i.qty}x ${i.name}`).join(', '),
+                total: `R$ ${total.toFixed(2).replace('.', ',')}`,
+                status: 'Aguardando Pagamento'
+            });
+            renderDashboardOrders();
+
+            // Clear Cart
+            cart = [];
+            updateCartUI();
+            toggleCartModal();
+        }
+
+        // --- SELLER DASHBOARD LOGIC ---
+        function renderDashboardOrders() {
+            const filterStatus = document.getElementById('dashStatusFilter').value;
+            const tableBody = document.getElementById('dashOrdersTable');
+
+            const filtered = mockOrders.filter(o => filterStatus === 'todos' || o.status === filterStatus);
+
+            tableBody.innerHTML = filtered.map(order => `
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-4 py-3 font-bold text-gray-800">
+                        ${order.id}
+                        <div class="text-[10px] text-gray-400 font-normal">${order.date}</div>
+                    </td>
+                    <td class="px-4 py-3 font-medium text-gray-800">${order.client}</td>
+                    <td class="px-4 py-3">
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded ${order.mode === 'Atacado' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'}">
+                            ${order.mode}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-xs text-gray-600 max-w-xs truncate" title="${order.itemsSummary}">${order.itemsSummary}</td>
+                    <td class="px-4 py-3 font-black text-brand-dark">${order.total}</td>
+                    <td class="px-4 py-3">
+                        <span class="text-[10px] font-bold px-2 py-1 rounded-full ${getStatusBadgeClass(order.status)}">
+                            ${order.status}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-right">
+                        <button onclick="sendWhatsAppReminder('${order.client}', '${order.total}', '${order.id}')" title="Enviar Cobrança WhatsApp" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white border border-emerald-200 px-2.5 py-1 rounded-lg text-xs font-bold transition">
+                            <i class="fa-brands fa-whatsapp"></i> Cobrar
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function getStatusBadgeClass(status) {
+            switch(status) {
+                case 'Concluído': return 'bg-emerald-100 text-emerald-800';
+                case 'Aguardando Pagamento': return 'bg-amber-100 text-amber-800';
+                case 'Em Separação': return 'bg-purple-100 text-purple-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        function openCustomChargeModal() {
+            document.getElementById('customChargeModal').classList.remove('hidden');
+        }
+
+        function closeCustomChargeModal() {
+            document.getElementById('customChargeModal').classList.add('hidden');
+        }
+
+        function handleGenerateCharge(e) {
+            e.preventDefault();
+
+            const client = document.getElementById('chargeClientName').value;
+            const phone = document.getElementById('chargeClientPhone').value.replace(/\D/g, '');
+            const amount = parseFloat(document.getElementById('chargeAmount').value).toFixed(2).replace('.', ',');
+            const paymentType = document.getElementById('chargePaymentType').value;
+            const desc = document.getElementById('chargeDescription').value;
+
+            let msg = `*COBRANÇA DE PEDIDO - BARRETO & BARRETO AUTO CENTER*\n`;
+            msg += `--------------------------------------------------\n`;
+            msg += `Olá, *${client}*!\n`;
+            msg += `Segue os detalhes da sua ordem de serviço/compra:\n\n`;
+            msg += `*Descrição:* ${desc}\n`;
+            msg += `*Forma de Pagamento:* ${paymentType}\n`;
+            msg += `*VALOR TOTAL: R$ ${amount}*\n`;
+            msg += `--------------------------------------------------\n`;
+            msg += `Para confirmar e receber a chave Pix para pagamento, responda a esta mensagem.`;
+
+            const targetPhone = phone.length <= 11 ? `55${phone}` : phone;
+            window.open(`https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+
+            // Append to dashboard mock
+            mockOrders.unshift({
+                id: `CHG-${Math.floor(1000 + Math.random() * 9000)}`,
+                date: new Date().toLocaleDateString('pt-BR'),
+                client: client,
+                mode: 'Cobrança Direta',
+                itemsSummary: desc,
+                total: `R$ ${amount}`,
+                status: 'Aguardando Pagamento'
+            });
+
+            renderDashboardOrders();
+            closeCustomChargeModal();
+            document.getElementById('chargeForm').reset();
+        }
+
+        function sendWhatsAppReminder(client, total, orderId) {
+            let msg = `Olá *${client}*, referente ao seu pedido *${orderId}* na *Barreto & Barreto Auto Center* no valor de *${total}*.\n`;
+            msg += `Estamos aguardando a confirmação do pagamento para liberação e envio dos itens.\nQualquer dúvida estamos à disposição!`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+    </script>
+</body>
+</html>
